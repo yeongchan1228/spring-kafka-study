@@ -1,5 +1,6 @@
 package springkafkastudy.kafkastudy.producer;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,8 @@ import org.springframework.kafka.core.KafkaProducerException;
 import org.springframework.kafka.core.KafkaSendCallback;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.RoutingKafkaTemplate;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
+import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -23,11 +26,14 @@ public class AdvancedProducer {
     private String topic;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final RoutingKafkaTemplate routingKafkaTemplate;
+    private final ReplyingKafkaTemplate<String, String, String> replyingKafkaTemplate;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public AdvancedProducer(KafkaTemplate<String, String> kafkaTemplate, RoutingKafkaTemplate routingKafkaTemplate) {
+    public AdvancedProducer(KafkaTemplate<String, String> kafkaTemplate, RoutingKafkaTemplate routingKafkaTemplate,
+                            ReplyingKafkaTemplate<String, String, String> replyingKafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
         this.routingKafkaTemplate = routingKafkaTemplate;
+        this.replyingKafkaTemplate = replyingKafkaTemplate;
     }
 
     public void syncSend(String message) {
@@ -63,5 +69,20 @@ public class AdvancedProducer {
 
     public void routingSend(String message) {
         routingKafkaTemplate.send(topic, message);
+    }
+
+    public void replyingSend(String topic, String message) {
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, message);
+        RequestReplyFuture<String, String, String> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
+        try {
+            ConsumerRecord<String, String> consumerRecord = replyFuture.get(10, TimeUnit.SECONDS);
+            log.info("[ConsumerRecord] {}", consumerRecord.value());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

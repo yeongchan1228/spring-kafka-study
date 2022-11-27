@@ -28,8 +28,11 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public NewTopic newTopic() {
-        return TopicBuilder.name("test-event").build();
+    public KafkaAdmin.NewTopics newTopics() {
+        return new KafkaAdmin.NewTopics(
+                TopicBuilder.name("test-request").build(),
+                TopicBuilder.name("test-replies").build()
+        );
     }
 
     @Bean

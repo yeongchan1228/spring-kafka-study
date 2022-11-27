@@ -23,6 +23,7 @@ public class KafkaStudyApplication {
 			advancedProducer.asyncSend("test message1.");
 			advancedProducer.syncSend("test message2.");
 			advancedProducer.routingSend("test message3.");
+			advancedProducer.replyingSend("test-request", "test-message4.");
 		};
 	}
 
