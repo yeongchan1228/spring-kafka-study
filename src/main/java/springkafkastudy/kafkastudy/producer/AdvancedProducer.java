@@ -60,4 +60,8 @@ public class AdvancedProducer {
             }
         });
     }
+
+    public void routingSend(String message) {
+        routingKafkaTemplate.send(topic, message);
+    }
 }
