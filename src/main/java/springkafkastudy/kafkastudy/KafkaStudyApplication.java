@@ -6,7 +6,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import springkafkastudy.kafkastudy.producer.AdvancedProducer;
+import org.springframework.kafka.listener.KafkaMessageListenerContainer;
+import springkafkastudy.kafkastudy.producer.Advanced2Producer;
 
 @SpringBootApplication
 public class KafkaStudyApplication {
@@ -18,14 +19,24 @@ public class KafkaStudyApplication {
 	}
 
 	@Bean
-	public ApplicationRunner runner(AdvancedProducer advancedProducer) {
+	public ApplicationRunner runner(Advanced2Producer advanced2Producer,
+									KafkaMessageListenerContainer kafkaMessageListenerContainer) {
 		return args -> {
-			advancedProducer.asyncSend("test message1.");
-			advancedProducer.syncSend("test message2.");
-			advancedProducer.routingSend("test message3.");
-			advancedProducer.replyingSend("test-request", "test-message4.");
+			kafkaMessageListenerContainer.start();
+
+			advanced2Producer.asyncSend("test-message5.");
 		};
 	}
+
+//	@Bean
+//	public ApplicationRunner runner(AdvancedProducer advancedProducer) {
+//		return args -> {
+//			advancedProducer.asyncSend("test message1.");
+//			advancedProducer.syncSend("test message2.");
+//			advancedProducer.routingSend("test message3.");
+//			advancedProducer.replyingSend("test-request", "test-message4.");
+//		};
+//	}
 
 //	@Bean
 //	public ApplicationRunner runner(AdminClient adminClient) {
