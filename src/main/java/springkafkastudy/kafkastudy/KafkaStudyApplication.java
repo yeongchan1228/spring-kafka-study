@@ -6,7 +6,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.kafka.listener.KafkaMessageListenerContainer;
+import springkafkastudy.kafkastudy.model.Member;
 import springkafkastudy.kafkastudy.producer.Advanced2Producer;
 
 @SpringBootApplication
@@ -19,12 +19,10 @@ public class KafkaStudyApplication {
 	}
 
 	@Bean
-	public ApplicationRunner runner(Advanced2Producer advanced2Producer,
-									KafkaMessageListenerContainer kafkaMessageListenerContainer) {
+	public ApplicationRunner runner(Advanced2Producer advanced2Producer) {
 		return args -> {
-			kafkaMessageListenerContainer.start();
-
-			advanced2Producer.asyncSend("test-message5.");
+//			advanced2Producer.asyncSend("test-message5.");
+			advanced2Producer.asyncMemberSend(new Member("test@test.com", 10));
 		};
 	}
 
